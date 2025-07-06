@@ -1,0 +1,6 @@
+{
+  "name": "AI Insight Hub: Weekly Digest",
+  "description": "A web application that curates and displays trending AI news. Features user authentication via GitHub, a persistent database of AI resources, and email subscriptions.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
