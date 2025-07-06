@@ -8,7 +8,9 @@
       "Bash(git commit:*)",
       "Bash(npm run build:*)",
       "Bash(rm:*)",
-      "Bash(npm run preview:*)"
+      "Bash(npm run preview:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }
