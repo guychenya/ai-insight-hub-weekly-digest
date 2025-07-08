@@ -7,12 +7,14 @@ import SubscriptionForm from './components/SubscriptionForm';
 import Loader from './components/Loader';
 import SourceCitations from './components/SourceCitations';
 import GenerationProgress from './components/GenerationProgress';
+import InsightFilters from './components/InsightFilters';
 import { IconAlertTriangle, IconSparkles, IconTrash } from './components/IconComponents';
 import { useAuth } from './hooks/useAuth';
 import Auth from './components/Auth';
 
 const App: React.FC = () => {
   const [articles, setArticles] = useState<AIResource[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<AIResource[]>([]);
   const [sources, setSources] = useState<GroundingSource[] | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(true);
@@ -36,6 +38,7 @@ const App: React.FC = () => {
       }));
       
       setArticles(articlesWithDates);
+      setFilteredArticles(articlesWithDates);
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Could not load AI digest.');
@@ -104,6 +107,10 @@ const App: React.FC = () => {
       setIsClearing(false);
     }
   }, [fetchArticles]);
+
+  const handleFilterChange = useCallback((filtered: AIResource[]) => {
+    setFilteredArticles(filtered);
+  }, []);
 
   const isLoading = isFetching || authLoading;
 
@@ -177,11 +184,25 @@ const App: React.FC = () => {
             )}
             
             {!isGenerating && articles.length > 0 && (
-              <div className="space-y-8">
-                {articles.map((article, index) => (
-                  <ProjectCard key={article.id} resource={article} index={index} />
-                ))}
-              </div>
+              <>
+                <InsightFilters 
+                  articles={articles} 
+                  onFilterChange={handleFilterChange}
+                />
+                
+                {filteredArticles.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <p className="text-lg">No articles match your filters.</p>
+                    <p>Try adjusting your filter criteria.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {filteredArticles.map((article, index) => (
+                      <ProjectCard key={article.id} resource={article} index={index} />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
           
@@ -194,6 +215,42 @@ const App: React.FC = () => {
           <div className="mt-16 border-t border-gray-700 pt-10">
             <SubscriptionForm user={user} />
           </div>
+
+          {/* Footer with Love signature */}
+          <footer className="mt-16 border-t border-gray-700 pt-8 pb-8">
+            <div className="text-center space-y-4">
+              <p className="text-gray-500 text-sm flex items-center justify-center space-x-2">
+                <span>Built with</span>
+                <svg className="w-4 h-4 text-red-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                </svg>
+                <span>by</span>
+                <a 
+                  href="https://www.guyc.dev" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-300 hover:to-purple-400 transition-all duration-300 font-medium"
+                >
+                  Guy Chenya
+                </a>
+              </p>
+              
+              <div className="text-xs text-gray-600 max-w-2xl mx-auto">
+                <p className="mb-2">
+                  This is a demonstration application showcasing AI-powered content generation capabilities using Vibe-Coding methodologies. 
+                  All content is generated for demonstration purposes only.
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap justify-center items-center space-x-6 text-xs text-gray-500">
+                <a href="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
+                <span className="text-gray-700">•</span>
+                <a href="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</a>
+                <span className="text-gray-700">•</span>
+                <span>© 2025 Guy Chenya</span>
+              </div>
+            </div>
+          </footer>
 
         </div>
       </main>

@@ -12,11 +12,27 @@ const COOLDOWN_MS = 2000; // 2 seconds between requests
 const handler: Handler = async (event) => {
   console.log("Generate digest function called");
   
+  // Add CORS headers
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: '',
+    };
+  }
+  
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
       body: JSON.stringify({ message: 'Method Not Allowed' }),
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     };
   }
   
@@ -31,7 +47,7 @@ const handler: Handler = async (event) => {
         error: true,
         message: `Please wait ${remaining} seconds before generating another digest.` 
       }),
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     };
   }
   
@@ -48,12 +64,12 @@ const handler: Handler = async (event) => {
       return {
         statusCode: 500,
         body: JSON.stringify({ message: "Server configuration error. Please check environment variables." }),
-        headers: { 'Content-Type': 'application/json' },
+        headers,
       };
     }
 
     console.log("Initializing Gemini AI...");
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
 
     console.log("Calling Gemini API for content generation...");
     
@@ -87,14 +103,12 @@ IMPORTANT: The content must logically match the source - don't put startup fundi
 Return ONLY valid JSON:
 [{"id":"1","title":"...","description":"...","sourceName":"...","url":"...","trendingScore":0.8,"tags":["AI","Tech"]}]`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: [{ parts: [{ text: simplePrompt }] }]
-    });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(simplePrompt);
     
     console.log("Gemini API response received successfully");
 
-    let jsonStr = response.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    let jsonStr = response.response.text().trim();
     console.log("Raw response:", jsonStr.substring(0, 500) + "...");
     
     const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
@@ -172,7 +186,7 @@ Return ONLY valid JSON:
     return {
       statusCode: 200,
       body: JSON.stringify({ articles, sources }),
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     };
 
   } catch (error) {
@@ -255,7 +269,7 @@ Return ONLY valid JSON:
     return {
       statusCode: 200,
       body: JSON.stringify({ articles: mockArticles, sources: fallbackSources }),
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     };
   }
 };

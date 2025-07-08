@@ -10,7 +10,10 @@
       "Bash(rm:*)",
       "Bash(npm run preview:*)",
       "Bash(grep:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:ai-insight-hub-weekly-digest.netlify.app)",
+      "Bash(cd:*)"
     ],
     "deny": []
   }

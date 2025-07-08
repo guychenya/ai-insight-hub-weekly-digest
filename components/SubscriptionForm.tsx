@@ -93,9 +93,15 @@ const SubscriptionForm: React.FC<SubscriptionFormProps> = ({ user }) => {
   return (
     <div className="text-center p-8 bg-gray-800 border border-gray-700 rounded-xl shadow-inner">
       <h3 className="text-2xl font-bold text-white">Stay in the Loop</h3>
-      <p className="text-gray-400 mt-2 mb-6">
+      <p className="text-gray-400 mt-2 mb-2">
         {user ? `You are logged in as ${user.email || user.githubUsername}.` : 'Subscribe to receive the top trending AI projects in your inbox every week.'}
       </p>
+      <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3 mb-6">
+        <p className="text-yellow-300 text-xs">
+          📧 <strong>Demo Notice:</strong> This is a demonstration subscription form. 
+          While functional, this showcases the subscription flow using Vibe-Coding methodologies.
+        </p>
+      </div>
       
       {user ? (
          <div className="flex flex-col items-center gap-3">
